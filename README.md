@@ -27,8 +27,8 @@ This is not an officially supported Google product.
     virtualenv -p python3 ~/.venv/dp_imagenet
     source ~/.venv/dp_imagenet/bin/activate
     # Install Objax with CUDA
-    pip install --upgrade "jax[cuda111]" -f https://storage.googleapis.com/jax-releases/jax_releases.html
     pip install --upgrade objax
+    pip install --upgrade jax[cuda11_cudnn82] -f https://storage.googleapis.com/jax-releases/jax_releases.html
     # Tensorflow and TFDS (for datasets readers)
     pip install tensorflow
     pip install tensorflow-datasets
@@ -70,7 +70,49 @@ python imagenet/imagenet_train.py --tfds_data_dir="${TFDS_DATA_DIR}" --max_eval_
 python imagenet/imagenet_train.py --tfds_data_dir="${TFDS_DATA_DIR}" --max_eval_batches=10 --eval_every_n_steps=100 --model=resnet18 --train_device_batch_size=64
 ```
 
-TODO: best Imagenet result with pretraining and almost full batch.
+To pre-train model on Places365 and finetune with differential privacy on Imagenet use the following commands:
+
+```bash
+# Prepare directory for Places365 checkpoint
+PLACES_CHECKPOINT_DIR="${HOME}/experiments/places365"
+mkdir -p "${PLACES_CHECKPOINT_DIR}"
+
+# Pre-train model on Places365 without differential privacy
+python imagenet/imagenet_train.py \
+  --tfds_data_dir="${TFDS_DATA_DIR}" \
+  --dataset=places365 \
+  --eval_every_n_steps=1024 \
+  --model=resnet18 \
+  --num_train_epochs=80 \
+  --lr_warmup_epochs=4 \
+  --base_learning_rate=0.05 \
+  --disable_dp \
+  --train_device_batch_size=128 \
+  --model_dir="${PLACES_CHECKPOINT_DIR}"
+
+# Prepare directory for Imagenet checkpoint
+IMAGENET_DP_CHECKPOINT_DIR="${HOME}/experiments/imagenet_dp"
+mkdir -p "${IMAGENET_DP_CHECKPOINT_DIR}"
+
+# Finetune model on Imagenet with differential privacy
+python imagenet/imagenet_train.py \
+  --tfds_data_dir="${TFDS_DATA_DIR}" \
+  --eval_every_n_steps=1024 \
+  --model=resnet18 \
+  --num_train_epochs=40 \
+  --dp_clip_norm=20 \
+  --dp_sigma=0.032 \
+  --virtual_step_size=1024 \
+  --base_learning_rate=1e-5 \
+  --weight_decay=0 \
+  --lr_schedule="fixed" \
+  --optimizer="adam" \
+  --lr_warmup_epochs=4 \
+  --num_layers_to_freeze=8 \
+  --keep_ckpts=100 \
+  --finetune_path="${PLACES_CHECKPOINT_DIR}/ckpt/0000141312.npz" \
+  --model_dir="${IMAGENET_DP_CHECKPOINT_DIR}"
+```
 
 ## Running DP-SGD benchmarks
 
