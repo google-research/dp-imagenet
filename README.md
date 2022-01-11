@@ -102,7 +102,7 @@ python imagenet/imagenet_train.py \
   --num_train_epochs=40 \
   --dp_clip_norm=20 \
   --dp_sigma=0.032 \
-  --virtual_step_size=1024 \
+  --grad_acc_steps=1024 \
   --base_learning_rate=1e-5 \
   --weight_decay=0 \
   --lr_schedule="fixed" \
