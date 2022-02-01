@@ -1,7 +1,7 @@
 
 # Scaling differentially-private image classification.
 
-Code for the tech report "Training large scale image models with differential privacy."
+Code for the tech report [Toward Training at ImageNet Scale with Differential Privacy](https://arxiv.org/abs/2201.12328)
 by Alexey Kurakin, Steve Chien, Shuang Song, Roxana Geambasu, Andreas Terzis and Abhradeep Thakurta.
 
 This is not an officially supported Google product.
