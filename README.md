@@ -1,5 +1,5 @@
 
-# Scaling differentially-private image classification.
+# Differentially private Imagenet training
 
 Code for the tech report [Toward Training at ImageNet Scale with Differential Privacy](https://arxiv.org/abs/2201.12328)
 by Alexey Kurakin, Steve Chien, Shuang Song, Roxana Geambasu, Andreas Terzis and Abhradeep Thakurta.
@@ -78,6 +78,8 @@ PLACES_CHECKPOINT_DIR="${HOME}/experiments/places365"
 mkdir -p "${PLACES_CHECKPOINT_DIR}"
 
 # Pre-train model on Places365 without differential privacy
+# This will train a model to about 55% accuracy on Places365
+# when run on 8 GPUs.
 python imagenet/imagenet_train.py \
   --tfds_data_dir="${TFDS_DATA_DIR}" \
   --dataset=places365 \
@@ -94,22 +96,23 @@ python imagenet/imagenet_train.py \
 IMAGENET_DP_CHECKPOINT_DIR="${HOME}/experiments/imagenet_dp"
 mkdir -p "${IMAGENET_DP_CHECKPOINT_DIR}"
 
-# Finetune model on Imagenet with differential privacy
+# Finetune model on Imagenet with differential privacy.
+# This will train a differentially private Imagenet model
+# to approximately 48% accuracy with epsilon ~10, delta ~10^{-6}
+# when run on 8 GPUs.
+# If number of GPUs is different then adjust --grad_acc_steps argument
+# such that number_of_gpus*grad_acc_steps = 512.
 python imagenet/imagenet_train.py \
   --tfds_data_dir="${TFDS_DATA_DIR}" \
   --eval_every_n_steps=1024 \
   --model=resnet18 \
-  --num_train_epochs=40 \
-  --dp_clip_norm=20 \
-  --dp_sigma=0.032 \
-  --grad_acc_steps=1024 \
-  --base_learning_rate=1e-5 \
-  --weight_decay=0 \
-  --lr_schedule="fixed" \
-  --optimizer="adam" \
-  --lr_warmup_epochs=4 \
-  --num_layers_to_freeze=8 \
-  --keep_ckpts=100 \
+  --num_train_epochs=70 \
+  --dp_clip_norm=1.0 \
+  --dp_sigma=0.058014 \
+  --grad_acc_steps=64 \
+  --base_learning_rate=0.03 \
+  --lr_warmup_epochs=1 \
+  --num_layers_to_freeze=6 \
   --finetune_path="${PLACES_CHECKPOINT_DIR}/ckpt/0000141312.npz" \
   --model_dir="${IMAGENET_DP_CHECKPOINT_DIR}"
 ```
