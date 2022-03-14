@@ -25,7 +25,7 @@ from absl import app, flags, logging
 import objax
 from objax.typing import JaxArray
 from imagenet import imagenet_data
-from objax.zoo.resnet_v2 import ResNet50, ResNet18
+from objax.zoo.resnet_v2 import ResNet18, ResNet50, ResNet101, ResNet152, ResNet200
 from objax.zoo.wide_resnet import WideResNet
 
 flags.DEFINE_string('model_dir', '', 'Model directory.')
@@ -128,6 +128,18 @@ def make_model(model_name, num_classes):
     # syntax is 'wrn_D_W' where D - depth, W - width
     d, w = (int(val) for val in model_name.split('_')[1:])
     return WideResNet(nin=3, nclass=num_classes, depth=d, width=w, bn=objax.nn.GroupNorm2D)
+  if model_name == 'resnet200':
+    return ResNet200(in_channels=3,
+                     num_classes=num_classes,
+                     normalization_fn=objax.nn.GroupNorm2D)
+  if model_name == 'resnet152':
+    return ResNet152(in_channels=3,
+                     num_classes=num_classes,
+                     normalization_fn=objax.nn.GroupNorm2D)
+  if model_name == 'resnet101':
+    return ResNet101(in_channels=3,
+                     num_classes=num_classes,
+                     normalization_fn=objax.nn.GroupNorm2D)
   if model_name == 'resnet50':
     return ResNet50(in_channels=3,
                     num_classes=num_classes,
