@@ -176,3 +176,16 @@ CUDA_VISIBLE_DEVICES=0 python benchmarks/cifar10_tf.py --dpsgd=False
 # CIFAR10 example with DP
 CUDA_VISIBLE_DEVICES=0 python benchmarks/cifar10_tf.py
 ```
+
+## Pre-trained models
+
+We released the following model checkpoints pre-trained on Places365 dataset (without DP):
+
+| Network   | Places365 top-1 accuracy | Checkpoint |
+| --------- | ------------------------ | ------------- |
+| ResNet18  | 55.0% | [Link](http://storage.googleapis.com/gresearch/dp-imagenet/places365_resnet18_20220314.npz) (87 MiB) |
+| ResNet50  | 55.9% | [Link](http://storage.googleapis.com/gresearch/dp-imagenet/places365_resnet50_20220314.npz) (186 MiB) |
+| ResNet101  | 56.3% | [Link](http://storage.googleapis.com/gresearch/dp-imagenet/places365_resnet101_20220314.npz) (331 MiB) |
+| ResNet152  | 56.7% | [Link](http://storage.googleapis.com/gresearch/dp-imagenet/places365_resnet152_20220314.npz) (450 MiB) |
+| ResNet200  | 56.6% | [Link](http://storage.googleapis.com/gresearch/dp-imagenet/places365_resnet200_20220314.npz) (485 MiB) |
+
