@@ -43,6 +43,8 @@ flags.DEFINE_float('lr_warmup_epochs', 1.0,
                    'Number of learning rate warmup epochs.')
 flags.DEFINE_string('lr_schedule', 'cos', 'Learning rate schedule: "cos" or "fixed"')
 flags.DEFINE_string('optimizer', 'momentum', 'Optimizer to use: "momentum" or "adam"')
+flags.DEFINE_integer('rnd_seed', None,
+                     'Initial random seed, if not specified then OS source of entropy will be used.')
 
 flags.DEFINE_float('weight_decay', 1e-4, 'Weight decay (L2 loss) coefficient.')
 flags.DEFINE_string('model', 'resnet18', 'Model to use.')
@@ -393,6 +395,12 @@ def main(argv):
     print('JAX host: %d / %d' % (jax.process_index(), jax.process_count()))
     print('JAX devices:\n%s' % '\n'.join(str(d) for d in jax.devices()),
           flush=True)
+    if FLAGS.rnd_seed is not None:
+        rnd_seed = FLAGS.rnd_seed
+    else:
+        rnd_seed = int.from_bytes(os.urandom(8), 'big', signed=True)
+    print('Initial random seed %d', rnd_seed)
+    objax.random.DEFAULT_GENERATOR.seed(rnd_seed)
     experiment = Experiment()
     experiment.train_and_eval()
     objax.util.multi_host_barrier()
